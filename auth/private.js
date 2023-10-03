@@ -3,24 +3,35 @@ import withAuth from './withAuth';
 import { useUser } from './useUser';
 import config from '../config';
 
+require('dotenv').config();
+
 const sendRequest = (setResponse) => {
-  config.auth().currentUser.getIdToken(true).then(function(token) {
-    const helloUserUrl = "https://us-central1-resetemailccc.cloudfunctions.net/app/hello"
-    //const helloUserUrl = "http://localhost:5001/resetemailccc/us-central1/app/hello"
-    document.cookie = '__session=' + token + ';max-age=3600';
-    console.log('Sending request to', helloUserUrl, 'with ID token in __session cookie.');
+  config.auth().currentUser.getIdTokenResult(true).then(function(token) {
+    const apiUrl = "http://localhost:5001/reset_password"
+    const email = token.claims.email
+    document.cookie = '__session=' + token.token + ';max-age=3600';
+    console.log('Sending request to', apiUrl, 'with ID token in __session cookie.');
+
     let req = new XMLHttpRequest();
     req.onload = function() {
       console.log(req)
       setResponse(req.responseText);
     };
+
     req.onerror = function() {
       setResponse('There was an error');
     };
-    req.open('GET', helloUserUrl, true);
+
+    req.open('POST', apiUrl, true);
+    req.setRequestHeader('Access-Control-Allow-Origin', "*")
     req.setRequestHeader('Authorization', 'Bearer ' + token);
     req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    req.send();
+
+    console.log(email)
+    req.send(JSON.stringify({
+      email: email,
+      key: `${process.env.NEXT_PUBLIC_KEY}`
+    }));
   });
 }
 

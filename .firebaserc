@@ -1,7 +1,9 @@
 {
   "projects": {
-    "default": "resetemailccc",
-    "prod": "resetemailccc"
+    "default": "reset-senha-ldap",
+    "prod": "reset-senha-ldap",
+    "reset-senha": "reset-senha-ldap"
   },
-  "targets": {}
+  "targets": {},
+  "etags": {}
 }
